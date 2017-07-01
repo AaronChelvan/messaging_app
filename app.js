@@ -1,16 +1,21 @@
 var express = require("express");
 var app = express();
+var nunjucks = require("nunjucks");
 
-app.set('view engine', 'ejs');
+//Configure Nunjucks
+nunjucks.configure("views/", {
+    autoescape: true,
+    express: app
+});
 
 app.get("/", function (req, res) {
-  res.send("Hello World!")
+  res.render("index.html");
 });
 
 app.get("\*", function(req, res) {
-    res.send("This page doesn't exist :(")
+    res.render("error.html");
 });
 
 app.listen(3000, function () {
-  console.log('Example app listening on port 3000!')
-})
+  console.log('Listening on port 3000!')
+});

@@ -6,6 +6,7 @@ var bodyParser = require("body-parser");
 var passport = require("passport");
 var LocalStrategy = require("passport-local");
 var passportLocalMongoose = require("passport-local-mongoose");
+var User = require("./models/user");
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(require("express-session")({
@@ -24,24 +25,26 @@ nunjucks.configure("views", {
 mongoose.connect('mongodb://localhost/messaging_app_db');
 
 //Database schemas and models
-var userSchema = new mongoose.Schema({
+/*var UserSchema = new mongoose.Schema({
 	username: String
 });
-var User = mongoose.model("User", userSchema);
+var User = mongoose.model("User", UserSchema);*/
 
-var messageSchema = new mongoose.Schema({
+var MessageSchema = new mongoose.Schema({
 	sender: String, //username
 	recipient: String, //username
 	dateTimeReceived: String, //Maybe Number instead?
 	message: String
 });
-var Message = mongoose.model("Message", messageSchema);
+var Message = mongoose.model("Message", MessageSchema);
 
 //Set up Passport
-/*app.use(passport.initialize());
+app.use(passport.initialize());
 app.use(passport.session());
+
+passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());*/
+passport.deserializeUser(User.deserializeUser());
 
 //Default Route
 //If not logged in, go to 'home.html'

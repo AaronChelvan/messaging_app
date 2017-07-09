@@ -25,11 +25,6 @@ nunjucks.configure("views", {
 mongoose.connect('mongodb://localhost/messaging_app_db');
 
 //Database schemas and models
-/*var UserSchema = new mongoose.Schema({
-	username: String
-});
-var User = mongoose.model("User", UserSchema);*/
-
 var MessageSchema = new mongoose.Schema({
 	sender: String, //username
 	recipient: String, //username
@@ -50,14 +45,13 @@ passport.deserializeUser(User.deserializeUser());
 //If not logged in, go to 'home.html'
 //If logged in, go to 'messages.html'
 app.get("/", function(req, res){
-	//List all users
-	/*User.find({}, function(error, users){
-	    if (error) {
-	        console.log(error);
-	    } else {
-	        console.log(users);
-	    }
-	});*/
+	var name = "Aaron";
+	res.render("home.html", {name});
+});
+
+//Home Route
+//Contains links to Login and Sign Up Pages
+app.get("/home", function(req, res){
 	var name = "Aaron";
 	res.render("home.html", {name});
 });
@@ -66,38 +60,57 @@ app.get("/", function(req, res){
 app.get("/login", function(req, res){
 	res.render("login.html");
 });
-app.post("/login", function(req,res){
 
+app.post("/login", passport.authenticate("local", {
+    successRedirect: "/messages",
+    failureRedirect: "/login"
+}), function(req, res){
 });
 
 //Sign Up Routes
 app.get("/signup", function(req, res){
 	res.render("signup.html");
 });
+
 app.post("/signup", function(req, res){
-
+    var newUser = new User({username: req.body.username});
+    User.register(newUser, req.body.password, function(error, user){
+        if (error) {
+            console.log(error);
+            res.render("login.html");
+        } else {
+			passport.authenticate("local")(req, res, function(){
+	        	res.redirect("messages");
+			});
+    	}
+    });
 });
 
-
-
-
-app.get("/home", function(req, res){
-	//List all users
-	/*User.find({}, function(error, users){
-	    if (error) {
-	        console.log(error);
-	    } else {
-	        console.log(users);
-	    }
-	});*/
-	var name = "Aaron";
-	res.render("home.html", {name});
+//Logout Route
+app.get("/logout", function(req, res){
+   req.logout();
+   res.redirect("/login");
 });
 
+//Messages Route (basically the home page once a user is logged in)
+app.get("/messages", function(req, res){
+	res.render("messages.html");
+});
+
+//For all other routes, the page does not exist
 app.get("\*", function(req, res){
     res.render("error.html");
-	console.log("ERROR");
 });
+
+//Middleware for checking is a user is logged in
+//If they are not logged in, redirect to 'login.html'
+function isLoggedIn(req, res, next){
+    if(req.isAuthenticated()){
+        return next();
+    }
+    res.redirect("/login");
+}
+
 
 app.listen(3000, function(){
 	console.log("Listening on port 3000!")

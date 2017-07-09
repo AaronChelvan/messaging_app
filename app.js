@@ -3,20 +3,14 @@ var app = express();
 var nunjucks = require("nunjucks");
 var mongoose = require("mongoose");
 
-//Connect the database
-mongoose.createConnection('mongodb://localhost:27017/app_db');
-
-//---
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, "mongodb connnection error"));
-//---
-
 //Configure Nunjucks
 nunjucks.configure("views", {
     autoescape: true,
     express: app
 });
 
+//Connect the database
+mongoose.connect('mongodb://localhost/messaging_app_db');
 
 //Database schemas and models
 var userSchema = new mongoose.Schema({
@@ -32,27 +26,16 @@ var messageSchema = new mongoose.Schema({
 });
 var Message = mongoose.model("Message", messageSchema);
 
-//Create a test user
-User.create({
-	name: "admin"
-}, function(error, user) {
-	if (error) {
-		console.log(error);
-	} else {
-		console.log(user);
-	}
-});
-//List all users
-User.find({}, function(error, users){
-    if (error) {
-        console.log(error);
-    } else {
-        console.log(users);
-    }
-});
-
 //Home/Login page
 app.get("/", function (req, res) {
+	//List all users
+	User.find({}, function(error, users){
+	    if (error) {
+	        console.log(error);
+	    } else {
+	        console.log(users);
+	    }
+	});
 	var name = "Aaron";
 	res.render("index.html", {name});
 });

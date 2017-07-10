@@ -9,6 +9,7 @@ var passportLocalMongoose = require("passport-local-mongoose");
 var User = require("./models/user");
 var Message = require("./models/message");
 
+app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(require("express-session")({
 	secret: "blah blah top secret :D",
@@ -36,20 +37,18 @@ passport.deserializeUser(User.deserializeUser());
 //Default Route
 //If not logged in, go to 'home.html'
 //If logged in, go to 'messages.html'
-app.get("/", function(req, res){
-	var name = "Aaron";
-	res.render("home.html", {name});
+app.get("/", isLoggedIn, function(req, res){
+	res.render("messages.html");
 });
 
 //Home Route
 //Contains links to Login and Sign Up Pages
-app.get("/home", function(req, res){
-	var name = "Aaron";
-	res.render("home.html", {name});
+app.get("/home", isNotLoggedIn, function(req, res){
+	res.render("home.html");
 });
 
 //Login Routes
-app.get("/login", function(req, res){
+app.get("/login", isNotLoggedIn, function(req, res){
 	res.render("login.html");
 });
 
@@ -60,7 +59,7 @@ app.post("/login", passport.authenticate("local", {
 });
 
 //Sign Up Routes
-app.get("/signup", function(req, res){
+app.get("/signup", isNotLoggedIn, function(req, res){
 	res.render("signup.html");
 });
 
@@ -79,13 +78,13 @@ app.post("/signup", function(req, res){
 });
 
 //Logout Route
-app.get("/logout", function(req, res){
+app.post("/logout", function(req, res){
    req.logout();
-   res.redirect("/login");
+   res.redirect("/home");
 });
 
 //Messages Route (basically the home page once a user is logged in)
-app.get("/messages", function(req, res){
+app.get("/messages", isLoggedIn, function(req, res){
 	res.render("messages.html");
 });
 
@@ -96,13 +95,52 @@ app.get("\*", function(req, res){
 
 //Middleware for checking is a user is logged in
 //If they are not logged in, redirect to 'login.html'
+//Used for routes which require the user to be logged in
 function isLoggedIn(req, res, next){
-    if(req.isAuthenticated()){
+    if (req.isAuthenticated()) {
         return next();
     }
-    res.redirect("/login");
+    res.redirect("/home");
 }
 
+//Middleware for checking is a user is not logged in
+//If they are logged in, redirect to 'messages.html'
+//Used for routes which require the user to not be logged in (home, login, sign up)
+function isNotLoggedIn(req, res, next){
+	if (!(req.isAuthenticated())) {
+		return next();
+	}
+	res.redirect("/messages");
+}
+
+//A function that returns a string containing the current date and time
+//YYYY-MM-DD-HH-MM-SS
+//TODO - look into whether the locale of the server/client has any impact on the date returned
+function getDateTime() {
+    var date = new Date();
+	var year = date.getFullYear();
+    var month = date.getMonth() + 1; //+1 Since getMonth() returns a number between 0 & 11
+	if (month < 10) {
+		month = "0" + month;
+	}
+    var day  = date.getDate();
+	if (day < 10) {
+		day = "0" + day;
+	}
+    var hour = date.getHours();
+	if (hour < 10) {
+		hour = "0" + hour;
+	}
+    var minute  = date.getMinutes();
+	if (minute < 10) {
+		minute = "0" + minute;
+	}
+    var second  = date.getSeconds();
+	if (second < 10) {
+		second = "0" + second;
+	}
+    return year + "-" + month + "-" + day + "-" + hour + "-" + min + "-" + sec;
+}
 
 app.listen(3000, function(){
 	console.log("Listening on port 3000!")

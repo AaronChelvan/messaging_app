@@ -3,7 +3,7 @@ var mongoose = require("mongoose");
 var MessageSchema = new mongoose.Schema({
 	sender: String, //username of sender
 	recipient: String, //username of recipient
-	dateTimeReceived: String, //Maybe Number instead?
+	dateTimeReceived: String, //YYYY-MM-DD-HH-MM-SS
 	message: String
 });
 

@@ -85,7 +85,41 @@ app.post("/logout", function(req, res){
 
 //Messages Route (basically the home page once a user is logged in)
 app.get("/messages", isLoggedIn, function(req, res){
-	res.render("messages.html");
+	var user = req.user; //The current user
+	res.render("messages.html", {user});
+});
+
+app.get("/messages/new", isLoggedIn, function(req, res){
+	res.render("newMessage.html");
+});
+
+app.post("/messages", isLoggedIn, function(req, res){
+	var currentDateTime = getDateTime();
+
+	Message.create({
+		sender: req.user.username,
+		recipient: req.body.recipient,
+		dateTimeReceived: currentDateTime,
+		message: req.body.message,
+		subject: req.body.subject
+	}, function(err, post){
+		User.findOne({username: req.body.recipient}, function(error, foundUser){
+			if(error){
+				console.log(error);
+			} else {
+				foundUser.messages.push(message);
+				foundUser.save(function(error, data){
+					if(err){
+						console.log(error);
+					} else {
+						console.log(data);
+					}
+				});
+			}
+		});
+	});
+
+	res.redirect("/messages");
 });
 
 //For all other routes, the page does not exist
@@ -139,7 +173,7 @@ function getDateTime() {
 	if (second < 10) {
 		second = "0" + second;
 	}
-    return year + "-" + month + "-" + day + "-" + hour + "-" + min + "-" + sec;
+    return year + "-" + month + "-" + day + "-" + hour + "-" + minute + "-" + second;
 }
 
 app.listen(3000, function(){

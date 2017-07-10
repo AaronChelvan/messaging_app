@@ -9,26 +9,25 @@
 		<form action="/logout" method="POST">
 			<button>Logout</button>
 		</form>
+		<p>Hi {{ user.username }}<p>
+		<p>Your Database UserID: {{ user._id }}</p> <!--Debugging Purposes-->
 		<h1>Your Messages</h1>
 		<table>
 			<tr>
 				<th>Sender</th>
 				<th>Time/Date Received</th>
 				<th>Subject</th>
-				<th>Message Preview</th>
 			</tr>
+
+			<!--Loop through all the user's messages, and print them out in rows-->
+			{% for message in user.messages %}
 			<tr>
-				<td>-</td>
-				<td>-</td>
-				<td>-</td>
-				<td>-</td>
+				<td>{{ message.sender }}</td>
+				<td>{{ message.dateTimeReceived }}</td>
+				<td>{{ message.subject }}</td>
 			</tr>
-			<tr>
-				<td>-</td>
-				<td>-</td>
-				<td>-</td>
-				<td>-</td>
-			</tr>
+			{% endfor %}
+
 		</table>
 	</body>
 </html>

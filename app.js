@@ -7,6 +7,7 @@ var passport = require("passport");
 var LocalStrategy = require("passport-local");
 var passportLocalMongoose = require("passport-local-mongoose");
 var User = require("./models/user");
+var Message = require("./models/message");
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(require("express-session")({
@@ -23,15 +24,6 @@ nunjucks.configure("views", {
 
 //Connect the database
 mongoose.connect('mongodb://localhost/messaging_app_db');
-
-//Database schemas and models
-var MessageSchema = new mongoose.Schema({
-	sender: String, //username
-	recipient: String, //username
-	dateTimeReceived: String, //Maybe Number instead?
-	message: String
-});
-var Message = mongoose.model("Message", MessageSchema);
 
 //Set up Passport
 app.use(passport.initialize());

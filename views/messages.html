@@ -11,23 +11,26 @@
 		</form>
 		<p>Hi {{ user.username }}<p>
 		<p>Your Database UserID: {{ user._id }}</p> <!--Debugging Purposes-->
+		<p><a href="messages/new">Send a Message</a></p>
 		<h1>Your Messages</h1>
-		<table>
+
+		<!--<p>{{ user.messages[0] }}<p>-->
+
+		<!--<table>
 			<tr>
 				<th>Sender</th>
 				<th>Time/Date Received</th>
 				<th>Subject</th>
 			</tr>
-
+		-->
 			<!--Loop through all the user's messages, and print them out in rows-->
-			{% for message in user.messages %}
+		<!--	{% for message in user.messages %}
 			<tr>
 				<td>{{ message.sender }}</td>
 				<td>{{ message.dateTimeReceived }}</td>
 				<td>{{ message.subject }}</td>
 			</tr>
 			{% endfor %}
-
-		</table>
+		</table>-->
 	</body>
 </html>

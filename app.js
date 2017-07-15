@@ -102,7 +102,7 @@ app.post("/messages", isLoggedIn, function(req, res){
 		dateTimeReceived: currentDateTime,
 		message: req.body.message,
 		subject: req.body.subject
-	}, function(err, post){
+	}, function(err, message){
 		User.findOne({username: req.body.recipient}, function(error, foundUser){
 			if(error){
 				console.log(error);

@@ -35,10 +35,12 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 //Default Route
-//If not logged in, go to 'home.html'
-//If logged in, go to 'messages.html'
 app.get("/", isLoggedIn, function(req, res){
-	res.render("messages.html");
+	if (req.isAuthenticated) { //If logged in, go to the '/messages' route
+		res.redirect("/messages");
+	} else { //If not logged in, go to the '/home' route
+		res.redirect("/home");
+	}
 });
 
 //Home Route

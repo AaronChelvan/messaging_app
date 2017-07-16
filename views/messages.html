@@ -22,12 +22,19 @@
 			</tr>
 			<!--Loop through all the user's messages, and print them out in rows-->
 			{% for message in user.messages %}
-			<tr>
-				<td>{{ message.sender }}</td>
-				<td>{{ message.dateTimeReceived }}</td>
-				<td>{{ message.subject }}</td>
+			<tr class="messageInfo">
+				<td align="center">{{ message.sender }}</td>
+				<td align="center">{{ message.dateTimeReceived }}</td>
+				<td align="center">{{ message.subject }}</td>
+			</tr>
+			<tr class="messageText">
+				<td align="center" colspan="3">{{ message.message }}</td>
 			</tr>
 			{% endfor %}
 		</table>
+		<!--jQuery-->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<!--My Javascript-->
+		<script src="/scripts/script.js"></script>
 	</body>
 </html>

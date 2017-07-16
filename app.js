@@ -104,6 +104,18 @@ app.get("/messages/new", isLoggedIn, function(req, res){
 app.post("/messages", isLoggedIn, function(req, res){
 	var currentDateTime = getDateTime();
 
+	//Delete the message
+	if (req.body.deleteMessageID != undefined) {
+		Message.findByIdAndRemove(req.body.deleteMessageID, function(error){
+			if (error) {
+				console.log(error);
+			} else {
+				res.redirect("/messages");
+			}
+		});
+		return;
+	}
+
 	Message.create({
 		sender: req.user.username,
 		recipient: req.body.recipient,

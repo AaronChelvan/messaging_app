@@ -28,7 +28,13 @@
 				<td align="center">{{ message.subject }}</td>
 			</tr>
 			<tr class="messageText">
-				<td align="center" colspan="3">{{ message.message }}</td>
+				<td align="center" colspan="3">
+					<form action="/messages" method="POST">
+						<input type="hidden" name="deleteMessageID" value="{{ message._id }}">
+						<button>Delete</button>
+					</form>
+					{{ message.message }}
+				</td>
 			</tr>
 			{% endfor %}
 		</table>

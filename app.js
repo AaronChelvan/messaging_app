@@ -68,7 +68,7 @@ app.post("/signup", function(req, res){
     User.register(newUser, req.body.password, function(error, user){
         if (error) {
             console.log(error);
-            res.render("login.html");
+            res.render("error.html", {error});
         } else {
 			passport.authenticate("local")(req, res, function(){
 	        	res.redirect("messages");
@@ -109,6 +109,7 @@ app.post("/messages", isLoggedIn, function(req, res){
 		Message.findByIdAndRemove(req.body.deleteMessageID, function(error){
 			if (error) {
 				console.log(error);
+				res.render("error.html", {error});
 			} else {
 				res.redirect("/messages");
 			}
@@ -144,7 +145,7 @@ app.post("/messages", isLoggedIn, function(req, res){
 
 //For all other routes, the page does not exist
 app.get("\*", function(req, res){
-    res.render("error.html");
+    res.render("pageDoesNotExist.html");
 });
 
 //Middleware for checking is a user is logged in

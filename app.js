@@ -54,9 +54,14 @@ app.get("/login", isNotLoggedIn, function(req, res){
 	res.render("login.html");
 });
 
+app.get("/loginFail", isNotLoggedIn, function(req, res){
+	error = "Username and/or password was entered incorrectly";
+	res.render("login.html", {error});
+});
+
 app.post("/login", passport.authenticate("local", {
     successRedirect: "/messages",
-    failureRedirect: "/login"
+    failureRedirect: "/loginFail"
 }), function(req, res){
 });
 

@@ -6,6 +6,9 @@
 	</head>
 	<body>
 		<h1>New Message</h1>
+		{% if error %}
+			<p> {{ error }}</p>
+		{% endif %}
 		<form action="/messages" method="POST">
 			<input type="text" name="recipient" placeholder="recipient">
 			<input type="text" name="subject" placeholder="subject">

@@ -90,13 +90,14 @@ app.get("/messages", isLoggedIn, function(req, res){
 	var id = req.user._id; //The database ID of the current user
 
 	User.findById(id).populate("messages").exec(function(error, foundUser){
-	   if(error){
-		   console.log(error);
-	   } else {
-		   console.log(foundUser)
-		   res.render("messages.html", {user: foundUser});
-	   }
-   });
+		if(error){
+			console.log(error);
+			res.render("error.html", {error});
+		} else {
+			console.log(foundUser)
+			res.render("messages.html", {user: foundUser});
+		}
+	});
 });
 
 app.get("/messages/new", isLoggedIn, function(req, res){
@@ -106,7 +107,7 @@ app.get("/messages/new", isLoggedIn, function(req, res){
 app.post("/messages", isLoggedIn, function(req, res){
 	var currentDateTime = getDateTime();
 
-	//Delete the message
+	//Delete a message
 	if (req.body.deleteMessageID != undefined) {
 		Message.findByIdAndRemove(req.body.deleteMessageID, function(error){
 			if (error) {
@@ -119,30 +120,41 @@ app.post("/messages", isLoggedIn, function(req, res){
 		return;
 	}
 
-	Message.create({
-		sender: req.user.username,
-		recipient: req.body.recipient,
-		dateTimeReceived: currentDateTime,
-		message: req.body.message,
-		subject: req.body.subject
-	}, function(err, message){
-		User.findOne({username: req.body.recipient}, function(error, foundUser){
-			if(error){
-				console.log(error);
-			} else {
-				foundUser.messages.push(message);
-				foundUser.save(function(error, data){
-					if(err){
+	//Create a message
+
+	User.findOne({username: req.body.recipient}, function(error, foundUser){
+		if (foundUser == null) {
+			//If the user does not exist, don't create the message
+			console.log("Attempted to send a message to a user that does not exist");
+			res.render("newMessage.html", {error: "That user does not exist!"});
+		} else {
+			//If the user exists, create the message
+			Message.create({
+				sender: req.user.username,
+				recipient: req.body.recipient,
+				dateTimeReceived: currentDateTime,
+				message: req.body.message,
+				subject: req.body.subject
+			}, function(err, message){
+				User.findOne({username: req.body.recipient}, function(error, foundUser){
+					if(error){
 						console.log(error);
+						res.render("error.html", {error});
 					} else {
-						console.log(data);
+						foundUser.messages.push(message);
+						foundUser.save(function(error, data){
+							if(err){
+								console.log(error);
+							} else {
+								console.log(data);
+							}
+						});
+						res.redirect("/messages");
 					}
 				});
-			}
-		});
+			});
+		}
 	});
-
-	res.redirect("/messages");
 });
 
 //For all other routes, the page does not exist
@@ -154,10 +166,11 @@ app.get("\*", function(req, res){
 //If they are not logged in, redirect to 'login.html'
 //Used for routes which require the user to be logged in
 function isLoggedIn(req, res, next){
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect("/home");
+	if (req.isAuthenticated()) {
+		next();
+	} else {
+		res.redirect("/home");
+	}
 }
 
 //Middleware for checking is a user is not logged in
@@ -165,9 +178,10 @@ function isLoggedIn(req, res, next){
 //Used for routes which require the user to not be logged in (home, login, sign up)
 function isNotLoggedIn(req, res, next){
 	if (!(req.isAuthenticated())) {
-		return next();
+		next();
+	} else {
+		res.redirect("/messages");
 	}
-	res.redirect("/messages");
 }
 
 //A function that returns a string containing the current date and time

@@ -10,9 +10,9 @@
 			<p> {{ error }}</p>
 		{% endif %}
 		<form action="/messages" method="POST">
-			<input type="text" name="recipient" placeholder="recipient">
-			<input type="text" name="subject" placeholder="subject">
-			<input type="text" name="message" placeholder="message">
+			<input type="text" name="recipient" placeholder="recipient" required>
+			<input type="text" name="subject" placeholder="subject" required>
+			<input type="text" name="message" placeholder="message" required>
 			<button>Send</button>
 		</form>
 		<a href="/messages">Back To Messages</a>

@@ -50,7 +50,7 @@ router.post("/signup", function(req, res){
     User.register(newUser, req.body.password, function(error, user){
         if (error) {
             console.log(error);
-            res.render("error.html", {error});
+            res.render("signup.html", {error: "A user with that username already exists."});
         } else {
 			passport.authenticate("local")(req, res, function(){
 	        	res.redirect("messages");

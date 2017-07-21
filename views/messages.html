@@ -10,14 +10,13 @@
 			<button>Logout</button>
 		</form>
 		<p>Hi {{ user.username }}<p>
-		<p>Your Database UserID: {{ user._id }}</p> <!--Debugging Purposes-->
 		<p><a href="messages/new">Send a Message</a></p>
 		<h1>Your Messages</h1>
 
 		<table>
 			<tr>
 				<th>Sender</th>
-				<th>Date/Time Received</th>
+				<th>Date & Time Received</th>
 				<th>Subject</th>
 			</tr>
 			<!--Loop through all the user's messages, and print them out in rows-->

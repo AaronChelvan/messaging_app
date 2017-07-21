@@ -60,7 +60,7 @@ router.post("/signup", function(req, res){
 });
 
 //Logout Route
-router.post("/logout", function(req, res){
+router.get("/logout", function(req, res){
    req.logout();
    res.redirect("/home");
 });

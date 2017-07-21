@@ -4,6 +4,10 @@ table {
 	margin-right: auto;
 }
 
+h1 {
+	text-align: center;
+}
+
 tr:nth-child(2n) {
     background-color: #ccfbff;
 	cursor: pointer;

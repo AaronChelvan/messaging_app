@@ -20,7 +20,7 @@ router.get("/messages", middleware.isLoggedIn, function(req, res){
 });
 
 router.get("/messages/new", middleware.isLoggedIn, function(req, res){
-	res.render("newMessage.html");
+	res.render("newMessage.html", {user: req.user});
 });
 
 router.post("/messages", middleware.isLoggedIn, function(req, res){

@@ -29,3 +29,16 @@ tr:nth-child(4n) {
 .messageText {
 	display: none;
 }
+
+form {
+  text-align: center;
+}
+
+/*.col-centered{
+    float: none;
+    margin: 0 auto;
+}*/
+
+.homePage {
+	text-align: center;
+}

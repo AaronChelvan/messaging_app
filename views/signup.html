@@ -10,16 +10,28 @@
 		<title>Sign Up</title>
 	</head>
 	<body>
-		<h1>Sign Up</h1>
-		{% if error %}
-		<p>{{ error }}</p>
-		{% endif %}
-		<form action="/signup" method="POST">
-			<input type="text" name="username" placeholder="username" required>
-			<input type="password" name="password" placeholder="password" required>
-			<button>Sign Up</button>
-		</form>
-		<a href="home">Back</a>
+		<div class="homePage">
+			<h1>Welcome</h1>
+			<div class="col-sm-4 col-sm-offset-4">
+				<ul class="nav nav-pills nav-justified">
+					<li><a href="login">Log In</a></li>
+					<li class="active"><a href="signup">Sign Up</a></li>
+				</ul>
+				<form action="/signup" method="POST">
+					<br>
+					{% if error %}
+					<p>{{ error }}</p>
+					{% endif %}
+					<div class="form-group">
+						<input type="text" class="form-control" name="username" placeholder="username" required>
+					</div>
+					<div class="form-group">
+						<input type="password" class="form-control" name="password" placeholder="password" required>
+					</div>
+					<button class="btn btn-default">Sign Up</button>
+				</form>
+			</div>
+		</div>
 
 		<!-- Bootstrap JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>

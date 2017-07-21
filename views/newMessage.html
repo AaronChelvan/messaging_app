@@ -24,14 +24,21 @@
 		</nav>
 
 		<h1>New Message</h1>
-		{% if error %}
-			<p> {{ error }}</p>
-		{% endif %}
+
 		<form action="/messages" method="POST">
-			<input type="text" name="recipient" placeholder="recipient" required>
-			<input type="text" name="subject" placeholder="subject" required>
-			<input type="text" name="message" placeholder="message" required>
-			<button>Send</button>
+			{% if error %}
+				<p>{{ error }}</p>
+			{% endif %}
+			<div class="form-group">
+				<input type="text" name="recipient" placeholder="recipient" required>
+			</div>
+			<div class="form-group">
+				<input type="text" name="subject" placeholder="subject" required>
+			</div>
+			<div class="form-group">
+				<input type="text" name="message" placeholder="message" required>
+			</div>
+			<button class="btn btn-default">Send</button>
 		</form>
 
 		<!-- Bootstrap JavaScript -->

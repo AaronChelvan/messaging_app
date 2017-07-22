@@ -1,19 +1,29 @@
+/*Do not allow the display to collapse further on widths less than 320px*/
+html, body {
+  min-width: 320px;
+}
+
 table {
 	border: 1px solid black;
-	margin-left: auto;
-	margin-right: auto;
+	/*margin-left: auto;
+	margin-right: auto;*/
+	width: 100%;
 }
 
 h1 {
 	text-align: center;
 }
 
-tr:nth-child(2n) {
+td {
+	text-align: center;
+}
+
+tr:nth-child(2n+2) {
     background-color: #ccfbff;
 	cursor: pointer;
 }
 
-tr:nth-child(4n) {
+tr:nth-child(2n+3) {
 	background-color: #ffe8ee;
 	cursor: pointer;
 }

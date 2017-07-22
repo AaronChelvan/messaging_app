@@ -24,32 +24,25 @@
 		</nav>
 
 		<h1>Your Messages</h1>
-
-		<table>
+		<div class="col-sm-3 col-sm-offset-3 col-xs-6">
+			<table>
 			<tr>
-				<th>Sender</th>
-				<th>Date & Time Received</th>
-				<th>Subject</th>
+				<th class="text-center">Sender</th>
+				<th class="text-center">Time of Last Message</th>
 			</tr>
 			<!--Loop through all the user's messages, and print them out in rows-->
 			{% for message in user.messages %}
 			<tr class="messageInfo">
-				<td align="center">{{ message.sender }}</td>
-				<td align="center">{{ message.dateTimeReceived }}</td>
-				<td align="center">{{ message.subject }}</td>
-			</tr>
-			<tr class="messageText">
-				<td align="center" colspan="3">
-					<form action="/messages" method="POST">
-						<input type="hidden" name="deleteMessageID" value="{{ message._id }}">
-						<button>Delete</button>
-					</form>
-					{{ message.message }}
-				</td>
+				<td>{{ message.sender }}</td>
+				<td><!--{{ message.lastMessageTime }}--></td>
 			</tr>
 			{% endfor %}
 		</table>
-
+		</div>
+		<div class="col-sm-3 col-xs-6" style="background-color: green">
+			<div class="messageText"> <!--Conversation1--> </div>
+			<div class="messageText"> <!--Conversation2 etc...--> </div>
+		</div>
 		<!-- jQuery -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 		<!-- Bootstrap JavaScript -->

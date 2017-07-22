@@ -4,10 +4,10 @@ var passportLocalMongoose = require("passport-local-mongoose");
 var UserSchema = new mongoose.Schema({
     username: String,
     password: String,
-	messages: [ //All messages sent to this user
+	conversations: [ //All conversations this user has
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "Message"
+			ref: "Conversation"
 		}
 	]
 });

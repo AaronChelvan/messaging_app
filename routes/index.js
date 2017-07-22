@@ -2,6 +2,7 @@ var express = require("express");
 var router  = express.Router({mergeParams: true});
 var passport = require("passport");
 var User = require("../models/user.js");
+var Conversation = require("../models/conversation");
 var Message = require("../models/message.js");
 var messageRoutes = require("./messages");
 var middleware = require("../middleware/index.js");

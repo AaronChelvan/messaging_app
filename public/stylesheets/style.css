@@ -42,3 +42,11 @@ form {
 .homePage {
 	text-align: center;
 }
+
+.loginForm {
+	display: none;
+}
+
+.signupForm {
+	display: none;
+}

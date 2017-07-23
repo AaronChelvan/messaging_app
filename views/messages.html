@@ -27,22 +27,53 @@
 		<div class="col-sm-3 col-sm-offset-3 col-xs-6">
 			<table>
 			<tr>
-				<th class="text-center">Sender</th>
+				<th class="text-center">User</th>
 				<th class="text-center">Time of Last Message</th>
 			</tr>
 			<!--Loop through all the user's messages, and print them out in rows-->
-			{% for message in user.messages %}
+			{% for conversation in user.conversations %}
+			{% if (conversation.userA == user.username) %}
 			<tr class="messageInfo">
-				<td>{{ message.sender }}</td>
-				<td><!--{{ message.lastMessageTime }}--></td>
+				<td>{{ conversation.userB }}</td>
+				<td>{{ conversation.lastMessageTime }}</td>
 			</tr>
+			{% endif %}
+			{% if (conversation.userB == user.username) %}
+			<tr class="messageInfo">
+				<td>{{ conversation.userA }}</td>
+				<td>{{ conversation.lastMessageTime }}</td>
+			</tr>
+			{% endif %}
 			{% endfor %}
 		</table>
 		</div>
-		<div class="col-sm-3 col-xs-6" style="background-color: green">
-			<div class="messageText"> <!--Conversation1--> </div>
-			<div class="messageText"> <!--Conversation2 etc...--> </div>
+		<div class="col-sm-3 col-xs-6">
+			{% for conversation in user.conversations %}
+			<div class="conversationText" style="border: 1px solid black">
+				{% for message in conversation.messages %}
+					<p> {{ message.sender }} {{ message.timeSent }} {{ message.messageText }}</p>
+				{% endfor %}
+
+				<form action="/messages/newMessage" method="POST">
+					<div class="form-group">
+						<input type="hidden" name="conversationID" value="{{ conversation._id }}">
+						<input type="text" name="messageText" placeholder="message" required>
+					</div>
+					<button class="btn btn-default">Send</button>
+				</form>
+
+				<form action="/messages/deleteConversation" method="POST">
+					<input type="hidden" name="conversationID" value="{{ conversation._id }}">
+					<button class="btn btn-default">Delete Conversation</button>
+				</form>
+
+
+
+
+			</div>
+			{% endfor %}
 		</div>
+
 		<!-- jQuery -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 		<!-- Bootstrap JavaScript -->

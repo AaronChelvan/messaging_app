@@ -16,15 +16,16 @@ router.get("/messages", middleware.isLoggedIn, function(req, res){
 		} else {
 			console.log(foundUser);
 			foundUser.conversations.forEach(function(conversation){
-				Conversation.findById(conversation._id).populate("messages").exec(function(error, foundConversation){
-					if (error){
+				Conversation.findById(conversation).populate("messages").exec(function(error, foundConversation){
+					if (error) {
 						console.log("error");
 						res.render("error.html", {error});
 					} else {
-						res.render("messages.html", {user: foundUser});
+						console.log(foundConversation);
 					}
 				});
 			});
+			res.render("messages.html", {user: foundUser});
 		}
 	});
 });
@@ -68,7 +69,7 @@ router.post("/messages/newConversation", middleware.isLoggedIn, function(req, re
 						Message.create({
 							sender: req.user.username,
 							timeSent: currentDateTime,
-							message: req.body.message
+							messageText: req.body.messageText
 						}, function(error, message){
 							Conversation.findOne({_id: conversation}, function(error, foundConversation){
 								if (error){
@@ -96,15 +97,23 @@ router.post("/messages/newConversation", middleware.isLoggedIn, function(req, re
 
 //Delete a conversation
 router.post("/messages/deleteConversation", middleware.isLoggedIn, function(req, res){
-	Conversation.findOne({_id: req.body.deleteConversationID}, function(error, foundConversation){
-		if (foundConversation.usersWatching == 2) {
+	Conversation.findOne({_id: req.body.conversationID}, function(error, foundConversation){
+		if (error) {
+			console.log(error);
+		} else if (foundConversation.usersWatching == 2) {
 			foundConversation.usersWatching = 1; //TODO - Check if this is right
+			foundConversation.save(function(error, data){
+				if (error){
+					console.log(error);
+				} else {
+					console.log(data);
+				}
+			});
 		} else {
 			foundConversation.messages.forEach(function(message){
 				Message.findByIdAndRemove(message, function(error){
 					if (error) {
 						console.log(error);
-						res.render("error.html", {error});
 					}
 				});
 			});
@@ -115,7 +124,30 @@ router.post("/messages/deleteConversation", middleware.isLoggedIn, function(req,
 
 //Create a new message for an existing conversation
 router.post("/messages/newMessage", middleware.isLoggedIn, function(req, res){
-
+	var currentDateTime = getDateTime();
+	Message.create({
+		sender: req.user.username,
+		timeSent: currentDateTime,
+		messageText: req.body.message
+	}, function(error, message){
+		Conversation.findOne({_id: req.body.conversationID}, function(error, foundConversation){
+			if (error){
+				console.log(error);
+				res.render("error.html", {error});
+			} else {
+				foundConversation.messages.push(message);
+				foundConversation.lastMessageTime = currentDateTime;
+				foundConversation.save(function(error, data){
+					if (error){
+						console.log(error);
+					} else {
+						console.log(data);
+						res.redirect("/messages");
+					}
+				});
+			}
+		});
+	});
 });
 
 //A function that returns a string containing the current date and time

@@ -12,6 +12,9 @@
 	<body>
 		<div class="homePage">
 			<h1>Welcome</h1>
+			{% if error %}
+			<p>{{ error }}</p>
+			{% endif %}
 			<div class="col-sm-4 col-sm-offset-4">
 				<ul class="nav nav-pills nav-justified">
 					<li id="loginSelect"><a href="#">Log In</a></li>
@@ -20,9 +23,6 @@
 				<!-- Login Form -->
 				<form class = "loginForm" action="/login" method="POST">
 					<br>
-					{% if error %}
-					<p>{{ error }}</p>
-					{% endif %}
 					<div class="form-group">
 						<input type="text" class="form-control" name="username" placeholder="username" required>
 					</div>
@@ -35,9 +35,6 @@
 				<!-- Sign Up Form -->
 				<form class="signupForm" action="/signup" method="POST">
 					<br>
-					{% if error %}
-					<p>{{ error }}</p>
-					{% endif %}
 					<div class="form-group">
 						<input type="text" class="form-control" name="username" placeholder="username" required>
 					</div>

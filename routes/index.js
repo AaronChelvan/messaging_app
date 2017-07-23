@@ -32,7 +32,7 @@ router.get("/login", middleware.isNotLoggedIn, function(req, res){
 //If login fails
 router.get("/loginFail", middleware.isNotLoggedIn, function(req, res){
 	error = "Username and/or password was entered incorrectly";
-	res.render("login.html", {error});
+	res.render("home.html", {error});
 });
 
 router.post("/login", passport.authenticate("local", {

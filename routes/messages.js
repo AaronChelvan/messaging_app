@@ -32,7 +32,7 @@ router.post("/messages/newConversation", middleware.isLoggedIn, function(req, re
 		if (foundUser == null) {
 			//If the user does not exist, don't create the conversation
 			console.log("Attempted to send a message to a user that does not exist");
-			res.render("newMessage.html", {error: "That user does not exist!"});
+			res.render("newConversation.html", {error: "That user does not exist!"});
 		} else {
 			//If the user exists, create the conversation
 			Conversation.create({
@@ -108,7 +108,7 @@ router.post("/messages/deleteConversation", middleware.isLoggedIn, function(req,
 		if (error) {
 			console.log(error);
 		} else if (foundConversation.usersWatching == 2) {
-			foundConversation.usersWatching = 1; //TODO - Check if this is right
+			foundConversation.usersWatching = 1;
 			foundConversation.save(function(error, data){
 				if (error){
 					console.log(error);
@@ -116,7 +116,29 @@ router.post("/messages/deleteConversation", middleware.isLoggedIn, function(req,
 					console.log(data);
 				}
 			});
+
+			//Remove the conversation from the current user's array of conversations
+			User.findOne({username: req.user.username}, function(error, foundUser){
+				if (error) {
+					console.log(error);
+				} else {
+					var index = foundUser.conversations.indexOf(foundConversation._id);
+					if (index > -1) {
+					    foundUser.conversations.splice(index, 1);
+					}
+
+					foundUser.save(function(error, data){
+						if (error){
+							console.log(error);
+						} else {
+							console.log(data);
+						}
+					});
+				}
+			});
+
 		} else {
+			//Remove every message in the conversation from the database
 			foundConversation.messages.forEach(function(message){
 				Message.findByIdAndRemove(message, function(error){
 					if (error) {
@@ -124,6 +146,34 @@ router.post("/messages/deleteConversation", middleware.isLoggedIn, function(req,
 					}
 				});
 			});
+
+			//Remove the conversation itself from the database
+			Conversation.findByIdAndRemove(foundConversation, function(error){
+				if (error) {
+					console.log(error);
+				}
+			});
+
+			//Remove the conversation from the user's array of conversations
+			User.findOne({username: req.user.username}, function(error, foundUser){
+				if (error) {
+					console.log(error);
+				} else {
+					var index = foundUser.conversations.indexOf(foundConversation._id);
+					if (index > -1) {
+					    foundUser.conversations.splice(index, 1);
+					}
+
+					foundUser.save(function(error, data){
+						if (error){
+							console.log(error);
+						} else {
+							console.log(data);
+						}
+					});
+				}
+			});
+
 		}
 	});
 	res.redirect("/messages");

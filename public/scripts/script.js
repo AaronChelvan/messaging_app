@@ -1,4 +1,4 @@
-// Login/signup screen
+// Clicking on the login button reveals the login form
 $("#loginSelect").click(function(){
 	$(this).addClass("active");
 	$("#signupSelect").removeClass("active");
@@ -6,6 +6,7 @@ $("#loginSelect").click(function(){
 	$(".signupForm").hide();
 });
 
+// Clicking on the signup button reveals the signup form
 $("#signupSelect").click(function(){
 	$(this).addClass("active");
 	$("#loginSelect").removeClass("active");
@@ -13,7 +14,10 @@ $("#signupSelect").click(function(){
 	$(".signupForm").show();
 });
 
-//Hide/show the text of a message by clicking on the info bar of that message
-$(".messageInfo").click(function(){
-	$(this).next().toggle();
+// Clicking on the information bar of a conversation reveals the text of the conversation
+$(".messageInfo").click(function() {
+   var classes = $(this).attr("class");
+   var conversationID = classes.split(" ")[1];
+   $(".conversationText").hide();
+   $(".conversationText" + "." + conversationID).show();
 });

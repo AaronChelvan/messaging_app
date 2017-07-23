@@ -32,24 +32,21 @@
 			</tr>
 			<!--Loop through all the user's messages, and print them out in rows-->
 			{% for conversation in user.conversations %}
-			{% if (conversation.userA == user.username) %}
-			<tr class="messageInfo">
+			<tr class="messageInfo {{ conversation._id }}">
+				{% if (conversation.userA == user.username) %}
 				<td>{{ conversation.userB }}</td>
-				<td>{{ conversation.lastMessageTime }}</td>
-			</tr>
-			{% endif %}
-			{% if (conversation.userB == user.username) %}
-			<tr class="messageInfo">
+				{% endif %}
+				{% if (conversation.userB == user.username) %}
 				<td>{{ conversation.userA }}</td>
+				{% endif %}
 				<td>{{ conversation.lastMessageTime }}</td>
 			</tr>
-			{% endif %}
 			{% endfor %}
 		</table>
 		</div>
 		<div class="col-sm-3 col-xs-6">
 			{% for conversation in user.conversations %}
-			<div class="conversationText" style="border: 1px solid black">
+			<div class="conversationText {{ conversation._id }}">
 				{% for message in conversation.messages %}
 					<p> {{ message.sender }} {{ message.timeSent }} {{ message.messageText }}</p>
 				{% endfor %}
@@ -67,9 +64,6 @@
 					<p>{{ conversation._id }}</p>
 					<button class="btn btn-default">Delete Conversation</button>
 				</form>
-
-
-
 
 			</div>
 			{% endfor %}

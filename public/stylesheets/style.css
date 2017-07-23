@@ -36,8 +36,9 @@ tr:nth-child(2n+3) {
 
 }
 
-.messageText {
+.conversationText {
 	display: none;
+	border: 1px solid black;
 }
 
 form {

@@ -35,8 +35,7 @@
 			<tr class="messageInfo {{ conversation._id }}">
 				{% if (conversation.userA == user.username) %}
 				<td>{{ conversation.userB }}</td>
-				{% endif %}
-				{% if (conversation.userB == user.username) %}
+				{% elif (conversation.userB == user.username) %}
 				<td>{{ conversation.userA }}</td>
 				{% endif %}
 				<td>{{ conversation.lastMessageTime }}</td>
@@ -44,7 +43,7 @@
 			{% endfor %}
 		</table>
 		</div>
-		<div class="col-sm-3 col-xs-6">
+		<div class="col-sm-3 col-xs-6 conversationTextBox">
 			{% for conversation in user.conversations %}
 			<div class="conversationText {{ conversation._id }}">
 				{% for message in conversation.messages %}
@@ -54,17 +53,32 @@
 				<form action="/messages/newMessage" method="POST">
 					<div class="form-group">
 						<input type="hidden" name="conversationID" value="{{ conversation._id }}">
+						{% if (conversation.usersWatching == 1)%}
+							{% if (conversation.usersWatching == 1) and (conversation.userA == user.username) %}
+								<input type="text" name="messageText" placeholder="{{ conversation.userB }} left the conversation" disabled>
+							{% elif (conversation.usersWatching == 1) and (conversation.userB == user.username) %}
+								<input type="text" name="messageText" placeholder="{{ conversation.userA }} left the conversation" disabled>
+							{% endif %}
+						{% else %}
 						<input type="text" name="messageText" placeholder="message" required>
+						{% endif %}
 					</div>
-					<button class="btn btn-default">Send</button>
+					
+					{% if (conversation.usersWatching == 1) %}
+					<button class="btn btn-success" disabled>Send</button>
+					{% else %}
+					<button class="btn btn-success">Send</button>
+					{% endif %}
 				</form>
+
+				<br>
 
 				<form action="/messages/deleteConversation" method="POST">
 					<input type="hidden" name="conversationID" value="{{ conversation._id }}">
-					<p>{{ conversation._id }}</p>
-					<button class="btn btn-default">Delete Conversation</button>
+					<button class="btn btn-danger">Delete Conversation</button>
 				</form>
 
+				<br>
 			</div>
 			{% endfor %}
 		</div>

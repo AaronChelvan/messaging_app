@@ -38,6 +38,12 @@ tr:nth-child(2n+3) {
 
 .conversationText {
 	display: none;
+}
+
+.conversationTextBox {
+	height: 50vh;
+	overflow-y: scroll;
+	word-wrap: break-word;
 	border: 1px solid black;
 }
 

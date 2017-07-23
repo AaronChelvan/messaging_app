@@ -9,22 +9,12 @@ var middleware = require("../middleware");
 router.get("/messages", middleware.isLoggedIn, function(req, res){
 	var id = req.user._id; //The database ID of the current user
 
-	User.findById(id).populate("conversations").exec(function(error, foundUser){
+	User.findById(id).populate({path: "conversations", populate: {path: "messages"}}).exec(function(error, foundUser){
 		if(error){
 			console.log(error);
 			res.render("error.html", {error});
 		} else {
 			console.log(foundUser);
-			foundUser.conversations.forEach(function(conversation){
-				Conversation.findById(conversation).populate("messages").exec(function(error, foundConversation){
-					if (error) {
-						console.log("error");
-						res.render("error.html", {error});
-					} else {
-						console.log(foundConversation);
-					}
-				});
-			});
 			res.render("messages.html", {user: foundUser});
 		}
 	});
@@ -40,11 +30,11 @@ router.post("/messages/newConversation", middleware.isLoggedIn, function(req, re
 
 	User.findOne({username: req.body.recipient}, function(error, foundUser){
 		if (foundUser == null) {
-			//If the user does not exist, don't create the message
+			//If the user does not exist, don't create the conversation
 			console.log("Attempted to send a message to a user that does not exist");
 			res.render("newMessage.html", {error: "That user does not exist!"});
 		} else {
-			//If the user exists, create the message
+			//If the user exists, create the conversation
 			Conversation.create({
 				userA: req.user.username,
 				userB: req.body.recipient,
@@ -52,6 +42,7 @@ router.post("/messages/newConversation", middleware.isLoggedIn, function(req, re
 				usersWatching: 2,
 				messages: []
 			}, function(error, conversation){
+				//Add the conversation to the recipient's conversation list
 				User.findOne({username: req.body.recipient}, function(error, foundUser){
 					if(error){
 						console.log(error);
@@ -65,30 +56,46 @@ router.post("/messages/newConversation", middleware.isLoggedIn, function(req, re
 								console.log(data);
 							}
 						});
-						//Once the conversation has been created, create the message
-						Message.create({
-							sender: req.user.username,
-							timeSent: currentDateTime,
-							messageText: req.body.messageText
-						}, function(error, message){
-							Conversation.findOne({_id: conversation}, function(error, foundConversation){
-								if (error){
-									console.log(error);
-									res.render("error.html", {error});
-								} else {
-									foundConversation.messages.push(message);
-									foundConversation.save(function(error, data){
-										if (error){
-											console.log(error);
-										} else {
-											console.log(data);
-											res.redirect("/messages");
-										}
-									});
-								}
-							});
+					}
+				});
+				//Add the conversation to the sender's conversation list
+				User.findOne({username: req.user.username}, function(error, foundUser){
+					if(error){
+						console.log(error);
+						res.render("error.html", {error});
+					} else {
+						foundUser.conversations.push(conversation);
+						foundUser.save(function(error, data){
+							if(error){
+								console.log(error);
+							} else {
+								console.log(data);
+							}
 						});
 					}
+				});
+				//Once the conversation has been created, create the message
+				Message.create({
+					sender: req.user.username,
+					timeSent: currentDateTime,
+					messageText: req.body.messageText
+				}, function(error, message){
+					Conversation.findOne({_id: conversation}, function(error, foundConversation){
+						if (error){
+							console.log(error);
+							res.render("error.html", {error});
+						} else {
+							foundConversation.messages.push(message);
+							foundConversation.save(function(error, data){
+								if (error){
+									console.log(error);
+								} else {
+									console.log(data);
+									res.redirect("/messages");
+								}
+							});
+						}
+					});
 				});
 			});
 		}
@@ -128,7 +135,7 @@ router.post("/messages/newMessage", middleware.isLoggedIn, function(req, res){
 	Message.create({
 		sender: req.user.username,
 		timeSent: currentDateTime,
-		messageText: req.body.message
+		messageText: req.body.messageText
 	}, function(error, message){
 		Conversation.findOne({_id: req.body.conversationID}, function(error, foundConversation){
 			if (error){

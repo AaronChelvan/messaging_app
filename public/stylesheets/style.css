@@ -40,6 +40,10 @@ tr:nth-child(2n+3) {
 	display: none;
 }
 
+.showConversationText {
+	display: inline;
+}
+
 .conversationTextBox {
 	height: 50vh;
 	overflow-y: scroll;

@@ -15,7 +15,7 @@ router.get("/messages", middleware.isLoggedIn, function(req, res){
 			res.render("error.html", {error});
 		} else {
 			console.log(foundUser);
-			res.render("messages.html", {user: foundUser});
+			res.render("messages.html", {user: foundUser, lastActiveConversation:req.session["lastActiveConversation"]});
 		}
 	});
 });
@@ -199,6 +199,7 @@ router.post("/messages/newMessage", middleware.isLoggedIn, function(req, res){
 						console.log(error);
 					} else {
 						console.log(data);
+						req.session['lastActiveConversation'] = req.body.conversationID;
 						res.redirect("/messages");
 					}
 				});

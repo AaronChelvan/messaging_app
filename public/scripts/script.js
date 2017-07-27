@@ -21,3 +21,7 @@ $(".messageInfo").click(function() {
    $(".conversationText").hide();
    $(".conversationText" + "." + conversationID).show();
 });
+
+// Every time a message is sent & the page is reloaded, we want the conversation textbox to
+// be scrolled down to the bottom, so that the most recent messages are shown.
+$('.conversationTextBox').scrollTop($('.conversationTextBox')[0].scrollHeight);

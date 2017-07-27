@@ -45,9 +45,13 @@
 		</div>
 		<div class="col-sm-3 col-xs-6 conversationTextBox">
 			{% for conversation in user.conversations %}
+			{% if (lastActiveConversation == conversation._id) %}
+			<div class="conversationText {{ conversation._id }} showConversationText">
+			{% else %}
 			<div class="conversationText {{ conversation._id }}">
+			{% endif %}
 				{% for message in conversation.messages %}
-					<p> {{ message.sender }} {{ message.timeSent }} {{ message.messageText }}</p>
+					<p> <strong>{{ message.sender }}</strong> [{{ message.timeSent }}] {{ message.messageText }}</p>
 				{% endfor %}
 
 				<form action="/messages/newMessage" method="POST">
@@ -63,7 +67,7 @@
 						<input type="text" name="messageText" placeholder="message" required>
 						{% endif %}
 					</div>
-					
+
 					{% if (conversation.usersWatching == 1) %}
 					<button class="btn btn-success" disabled>Send</button>
 					{% else %}

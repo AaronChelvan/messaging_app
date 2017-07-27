@@ -71,3 +71,13 @@ form {
 .signupForm {
 	display: none;
 }
+
+.senderName {
+	font-weight: bold;
+	color: #145dd1;
+}
+
+.recipientName {
+	font-weight: bold;
+	color: #a5030e;
+}

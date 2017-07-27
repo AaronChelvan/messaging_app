@@ -51,7 +51,14 @@
 			<div class="conversationText {{ conversation._id }}">
 			{% endif %}
 				{% for message in conversation.messages %}
-					<p> <strong>{{ message.sender }}</strong> [{{ message.timeSent }}] {{ message.messageText }}</p>
+					<p>
+						{% if (message.sender == user.username) %}
+						<span class="senderName">{{ message.sender }} (You)</span>
+						{% else %}
+						<span class="recipientName">{{ message.sender }}</span>
+						{% endif %}
+						[{{ message.timeSent }}] {{ message.messageText }}
+					</p>
 				{% endfor %}
 
 				<form action="/messages/newMessage" method="POST">

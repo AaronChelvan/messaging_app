@@ -27,8 +27,8 @@ nunjucks.configure("views", {
 });
 
 //Connect the database
-mongoose.connect('mongodb://localhost/messaging_app_db');
-
+//mongoose.connect('mongodb://localhost/messaging_app_db');
+mongoose.connect('mongodb://user:as98yuhk3jn435n3rryitxcvcvrwtq@ds127173.mlab.com:27173/messaging_app');
 //Set up Passport
 app.use(passport.initialize());
 app.use(passport.session());

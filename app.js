@@ -5,17 +5,14 @@ var mongoose = require("mongoose");
 var bodyParser = require("body-parser");
 var passport = require("passport");
 var LocalStrategy = require("passport-local");
-var passportLocalMongoose = require("passport-local-mongoose");
 var User = require("./models/user");
-var Conversation = require("./models/conversation");
-var Message = require("./models/message");
 var messageRoutes = require("./routes/messages");
 var indexRoutes = require("./routes/index");
 
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(require("express-session")({
-	secret: "blah blah top secret :D",
+	secret: process.env.EXPRESS_SECRET,
 	resave: false,
 	saveUninitialized: false
 }));
@@ -27,8 +24,7 @@ nunjucks.configure("views", {
 });
 
 //Connect the database
-//mongoose.connect('mongodb://localhost/messaging_app_db');
-mongoose.connect('mongodb://user:as98yuhk3jn435n3rryitxcvcvrwtq@ds127173.mlab.com:27173/messaging_app', {
+mongoose.connect(process.env.DB_URL, {
     useMongoClient: true,
 });
 //Set up Passport
@@ -43,7 +39,7 @@ passport.deserializeUser(User.deserializeUser());
 app.use(indexRoutes);
 app.use(messageRoutes);
 
-//Listen on Port 3000
-app.listen(process.env.PORT || 3000, function(){
-	console.log("Listening on port 3000!")
+//Listen on Port 8000
+app.listen(8000, function(){
+	console.log("Listening on port 8000!")
 });

@@ -16,6 +16,8 @@ var ConversationSchema = new mongoose.Schema({
 			ref: "Message"
 		}
 	]
+}, {
+  usePushEach: true
 });
 
 module.exports = mongoose.model("Conversation", ConversationSchema);

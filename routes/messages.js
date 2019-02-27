@@ -33,6 +33,9 @@ router.post("/messages/newConversation", middleware.isLoggedIn, function(req, re
 			//If the user does not exist, don't create the conversation
 			console.log("Attempted to send a message to a user that does not exist");
 			res.render("newConversation.html", {error: "That user does not exist!"});
+		} else if (req.body.recipient === req.user.username){
+			console.log("Attempted to send a message to yourself");
+			res.render("newConversation.html", {error: "Can't send a message to yourself!"});
 		} else {
 			//If the user exists, create the conversation
 			Conversation.create({
@@ -124,7 +127,7 @@ router.post("/messages/deleteConversation", middleware.isLoggedIn, function(req,
 				} else {
 					var index = foundUser.conversations.indexOf(foundConversation._id);
 					if (index > -1) {
-					    foundUser.conversations.splice(index, 1);
+						foundUser.conversations.splice(index, 1);
 					}
 
 					foundUser.save(function(error, data){
@@ -161,7 +164,7 @@ router.post("/messages/deleteConversation", middleware.isLoggedIn, function(req,
 				} else {
 					var index = foundUser.conversations.indexOf(foundConversation._id);
 					if (index > -1) {
-					    foundUser.conversations.splice(index, 1);
+						foundUser.conversations.splice(index, 1);
 					}
 
 					foundUser.save(function(error, data){
@@ -212,29 +215,29 @@ router.post("/messages/newMessage", middleware.isLoggedIn, function(req, res){
 //YYYY-MM-DD-HH-MM-SS
 //TODO - look into whether the locale of the server/client has any impact on the date returned
 function getDateTime() {
-    var date = new Date();
+	var date = new Date();
 	var year = date.getFullYear();
-    var month = date.getMonth() + 1; //+1 Since getMonth() returns a number between 0 & 11
+	var month = date.getMonth() + 1; //+1 Since getMonth() returns a number between 0 & 11
 	if (month < 10) {
 		month = "0" + month;
 	}
-    var day  = date.getDate();
+	var day  = date.getDate();
 	if (day < 10) {
 		day = "0" + day;
 	}
-    var hour = date.getHours();
+	var hour = date.getHours();
 	if (hour < 10) {
 		hour = "0" + hour;
 	}
-    var minute  = date.getMinutes();
+	var minute  = date.getMinutes();
 	if (minute < 10) {
 		minute = "0" + minute;
 	}
-    var second  = date.getSeconds();
+	var second  = date.getSeconds();
 	if (second < 10) {
 		second = "0" + second;
 	}
-    return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+	return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
 }
 
 module.exports = router;

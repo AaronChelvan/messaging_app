@@ -10,6 +10,8 @@ var UserSchema = new mongoose.Schema({
 			ref: "Conversation"
 		}
 	]
+}, {
+  usePushEach: true
 });
 
 UserSchema.plugin(passportLocalMongoose);

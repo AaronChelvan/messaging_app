@@ -40,6 +40,6 @@ app.use(indexRoutes);
 app.use(messageRoutes);
 
 //Listen on Port 8000
-app.listen(8000, function(){
+app.listen(process.env.PORT || 8000, function(){
 	console.log("Listening on port 8000!")
 });

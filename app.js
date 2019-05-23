@@ -2,12 +2,13 @@ var express = require("express");
 var app = express();
 var nunjucks = require("nunjucks");
 var mongoose = require("mongoose");
+mongoose.Promise = global.Promise;
 var bodyParser = require("body-parser");
 var passport = require("passport");
 var LocalStrategy = require("passport-local");
 var User = require("./models/user");
 var messageRoutes = require("./routes/messages");
-var indexRoutes = require("./routes/index");
+var authRoutes = require("./routes/auth");
 
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({extended: true}));
@@ -36,7 +37,7 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 //Routes
-app.use(indexRoutes);
+app.use(authRoutes);
 app.use(messageRoutes);
 
 //Listen on Port 8000

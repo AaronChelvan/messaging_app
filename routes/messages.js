@@ -208,6 +208,7 @@ function addMessageToConversation(sender, currentDateTime, messageContents, conv
 					res.render("error.html", {error});
 				} else {
 					foundConversation.messages.push(message);
+					foundConversation.lastMessageTime = currentDateTime;
 					foundConversation.save(function(error, data){
 						if (error){
 							console.log(error);

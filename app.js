@@ -2,6 +2,7 @@ var express = require("express");
 var app = express();
 var nunjucks = require("nunjucks");
 var mongoose = require("mongoose");
+mongoose.Promise = global.Promise;
 var bodyParser = require("body-parser");
 var passport = require("passport");
 var LocalStrategy = require("passport-local");

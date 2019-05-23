@@ -20,6 +20,7 @@ router.get("/messages", middleware.isLoggedIn, function(req, res){
 	});
 });
 
+// The page for creating a new conversation
 router.get("/messages/new", middleware.isLoggedIn, function(req, res){
 	res.render("newConversation.html", {user: req.user});
 });
@@ -38,79 +39,21 @@ router.post("/messages/newConversation", middleware.isLoggedIn, function(req, re
 			res.render("newConversation.html", {error: "Can't send a message to yourself!"});
 		} else {
 			//If the user exists, create the conversation
-			Conversation.create({
-				userA: req.user.username,
-				userB: req.body.recipient,
-				lastMessageTime: currentDateTime,
-				usersWatching: 2,
-				messages: []
-			}, function(error, conversation){
-				//Add the conversation to the recipient's conversation list
-				User.findOne({username: req.body.recipient}, function(error, foundUser){
-					if(error){
-						console.log(error);
-						res.render("error.html", {error});
-					} else {
-						foundUser.conversations.push(conversation);
-						foundUser.save(function(error, data){
-							if(error){
-								console.log(error);
-							} else {
-								console.log(data);
-							}
-						});
-					}
-				});
-				//Add the conversation to the sender's conversation list
-				User.findOne({username: req.user.username}, function(error, foundUser){
-					if(error){
-						console.log(error);
-						res.render("error.html", {error});
-					} else {
-						foundUser.conversations.push(conversation);
-						foundUser.save(function(error, data){
-							if(error){
-								console.log(error);
-							} else {
-								console.log(data);
-							}
-						});
-					}
-				});
-				//Once the conversation has been created, create the message
-				Message.create({
-					sender: req.user.username,
-					timeSent: currentDateTime,
-					messageText: req.body.messageText
-				}, function(error, message){
-					Conversation.findOne({_id: conversation}, function(error, foundConversation){
-						if (error){
-							console.log(error);
-							res.render("error.html", {error});
-						} else {
-							foundConversation.messages.push(message);
-							foundConversation.save(function(error, data){
-								if (error){
-									console.log(error);
-								} else {
-									console.log(data);
-									res.redirect("/messages");
-								}
-							});
-						}
-					});
-				});
-			});
+            createConversation(req.user.username, req.body.recipient, currentDateTime, req.body.messageText);
+            res.redirect("/messages");
 		}
 	});
 });
 
-//Delete a conversation
+// Delete a conversation
 router.post("/messages/deleteConversation", middleware.isLoggedIn, function(req, res){
 	Conversation.findOne({_id: req.body.conversationID}, function(error, foundConversation){
 		if (error) {
 			console.log(error);
 		} else if (foundConversation.usersWatching == 2) {
+            // Decrement "usersWatching".
+            // But do not delete all of the messages in the conversation yet, because
+            // the other user in the conversation has not deleted their copy of the conversation.
 			foundConversation.usersWatching = 1;
 			foundConversation.save(function(error, data){
 				if (error){
@@ -120,28 +63,11 @@ router.post("/messages/deleteConversation", middleware.isLoggedIn, function(req,
 				}
 			});
 
-			//Remove the conversation from the current user's array of conversations
-			User.findOne({username: req.user.username}, function(error, foundUser){
-				if (error) {
-					console.log(error);
-				} else {
-					var index = foundUser.conversations.indexOf(foundConversation._id);
-					if (index > -1) {
-						foundUser.conversations.splice(index, 1);
-					}
-
-					foundUser.save(function(error, data){
-						if (error){
-							console.log(error);
-						} else {
-							console.log(data);
-						}
-					});
-				}
-			});
-
+			// Remove the conversation from the current user's array of conversations
+            removeConversationFromUser(req.user.username, foundConversation._id);
 		} else {
-			//Remove every message in the conversation from the database
+            // Remove every message in the conversation from the database,
+            // since both users in the conversation have deleted it
 			foundConversation.messages.forEach(function(message){
 				Message.findByIdAndRemove(message, function(error){
 					if (error) {
@@ -150,7 +76,7 @@ router.post("/messages/deleteConversation", middleware.isLoggedIn, function(req,
 				});
 			});
 
-			//Remove the conversation itself from the database
+			// Remove the conversation itself from the database
 			Conversation.findByIdAndRemove(foundConversation, function(error){
 				if (error) {
 					console.log(error);
@@ -158,25 +84,7 @@ router.post("/messages/deleteConversation", middleware.isLoggedIn, function(req,
 			});
 
 			//Remove the conversation from the user's array of conversations
-			User.findOne({username: req.user.username}, function(error, foundUser){
-				if (error) {
-					console.log(error);
-				} else {
-					var index = foundUser.conversations.indexOf(foundConversation._id);
-					if (index > -1) {
-						foundUser.conversations.splice(index, 1);
-					}
-
-					foundUser.save(function(error, data){
-						if (error){
-							console.log(error);
-						} else {
-							console.log(data);
-						}
-					});
-				}
-			});
-
+            removeConversationFromUser(req.user.username, foundConversation._id);
 		}
 	});
 	res.redirect("/messages");
@@ -184,36 +92,14 @@ router.post("/messages/deleteConversation", middleware.isLoggedIn, function(req,
 
 //Create a new message for an existing conversation
 router.post("/messages/newMessage", middleware.isLoggedIn, function(req, res){
-	var currentDateTime = getDateTime();
-	Message.create({
-		sender: req.user.username,
-		timeSent: currentDateTime,
-		messageText: req.body.messageText
-	}, function(error, message){
-		Conversation.findOne({_id: req.body.conversationID}, function(error, foundConversation){
-			if (error){
-				console.log(error);
-				res.render("error.html", {error});
-			} else {
-				foundConversation.messages.push(message);
-				foundConversation.lastMessageTime = currentDateTime;
-				foundConversation.save(function(error, data){
-					if (error){
-						console.log(error);
-					} else {
-						console.log(data);
-						req.session['lastActiveConversation'] = req.body.conversationID;
-						res.redirect("/messages");
-					}
-				});
-			}
-		});
-	});
+    var currentDateTime = getDateTime();
+    addMessageToConversation(req.user.username, currentDateTime, req.body.messageText, req.body.conversationID);
+    req.session['lastActiveConversation'] = req.body.conversationID;
+    res.redirect("/messages");
 });
 
 //A function that returns a string containing the current date and time
 //YYYY-MM-DD-HH-MM-SS
-//TODO - look into whether the locale of the server/client has any impact on the date returned
 function getDateTime() {
 	var date = new Date();
 	var year = date.getFullYear();
@@ -238,6 +124,104 @@ function getDateTime() {
 		second = "0" + second;
 	}
 	return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+}
+
+// Given a sender, recipient, a timestamp, and the contents of the first message in the conversation,
+// create a conversation object and add it to the database
+function createConversation(sender, recipient, currentDateTime, messageContents) {
+    Conversation.create({
+        userA: sender,
+        userB: recipient,
+        lastMessageTime: currentDateTime,
+        usersWatching: 2,
+        messages: []
+    }, function(error, conversation){
+        if (error) {
+            console.log(error);
+            res.render("error.html", {error});
+        } else {
+            //Add the conversation to the recipient's conversation list
+            addConversationToUser(recipient, conversation);
+            //Add the conversation to the sender's conversation list
+            addConversationToUser(sender, conversation);
+            //Once the conversation has been created, create the first message, and add it to the conversation
+            addMessageToConversation(sender, currentDateTime, messageContents, conversation);
+        }
+    });
+}
+
+// Given a conversation and a username,
+// add a reference to that conversation to the user's conversation list in the database
+function addConversationToUser(username, conversation) {
+    User.findOne({username: username}, function(error, foundUser){
+        if(error){
+            console.log(error);
+            res.render("error.html", {error});
+        } else {
+            foundUser.conversations.push(conversation);
+            foundUser.save(function(error, data){
+                if(error){
+                    console.log(error);
+                } else {
+                    console.log(data);
+                }
+            });
+        }
+    });
+}
+
+// Given a conversation ID and a username,
+// remove the that conversation from the user's conversation list
+function removeConversationFromUser(username, conversationID) {
+    User.findOne({username: username}, function(error, foundUser){
+        if (error) {
+            console.log(error);
+        } else {
+            var index = foundUser.conversations.indexOf(conversationID);
+            if (index > -1) {
+                foundUser.conversations.splice(index, 1);
+            }
+
+            foundUser.save(function(error, data){
+                if (error){
+                    console.log(error);
+                } else {
+                    console.log(data);
+                }
+            });
+        }
+    });
+}
+
+// Create a new message and add it to a particular conversation
+// Include the username of the sender, and a timestamp
+function addMessageToConversation(sender, currentDateTime, messageContents, conversationID) {
+    Message.create({
+        sender: sender,
+        timeSent: currentDateTime,
+        messageText: messageContents
+    }, function(error, message){
+        if (error) {
+            console.log(error);
+            res.render("error.html", {error});
+        } else {
+            Conversation.findOne({_id: conversationID}, function(error, foundConversation){
+                if (error){
+                    console.log(error);
+                    res.render("error.html", {error});
+                } else {
+                    foundConversation.messages.push(message);
+                    foundConversation.save(function(error, data){
+                        if (error){
+                            console.log(error);
+                        } else {
+                            console.log(data);
+                        }
+                    });
+                }
+            });
+        }
+    });
 }
 
 module.exports = router;
